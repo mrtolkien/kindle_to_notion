@@ -1,3 +1,4 @@
 /target
 # Failed snapshots
 *.snap.new
+/coverage
