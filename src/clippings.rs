@@ -144,7 +144,7 @@ The old neighbour called at the White House, and Lincoln talked to him for hours
         let test_clip = "Building a Second Brain: A Proven Method to Organize Your Digital Life and Unlock Your Creative Potential (2022) (Tiago Forte)
 - Your Highlight at location 1096-1097 | Added on Sunday, 18 December 2022 10:20:38
 
-It’s important to keep capturing relatively effortless because it is only the first step.        
+It’s important to keep capturing relatively effortless because it is only the first step.
 ";
         let (_, parsed_clip) = nom_single_clip(test_clip).unwrap();
         insta::assert_yaml_snapshot!(parsed_clip);
