@@ -1,1 +1,3 @@
 /target
+# Failed snapshots
+*.snap.new

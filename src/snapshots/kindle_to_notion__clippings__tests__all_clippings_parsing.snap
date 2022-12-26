@@ -1,0 +1,21 @@
+---
+source: src/clippings.rs
+expression: parsed_clippings
+---
+- book: How to Win Friends and Influence People
+  author: Dale Carnegie
+  content: "The old neighbour called at the White House, and Lincoln talked to him for hours about the advisability of issuing a proclamation freeing the slaves. Lincoln went over all the arguments for and against such a move, and then read letters and newspaper articles, some denouncing him for not freeing the slaves and others denouncing him for fear he was going to free them. After talking for hours, Lincoln shook hands with his old neighbour, said good night, and sent him back to Illinois without even asking for his opinion. Lincoln had done all the talking himself. That seemed to clarify his mind. ‘He seemed to feel easier after that talk,’ the old friend said. Lincoln hadn’t wanted advice. He had wanted merely a friendly, sympathetic listener to whom he could unburden himself."
+  date: 2020-12-01
+- book: "Trillions: How a Band of Wall Street Renegades Invented the Index Fund and Changed Finance Forever"
+  author: Robin Wigglesworth
+  content: "Dunn pressed ahead. In May 2000, the WEBS unit was rebranded iShares. The origin of the name has been lost in the mists of time, with some executives attributing it to Apple’s launch of the iMac some years earlier, while others recall that it was a placeholder reference to “index shares” that simply stuck."
+  date: 2022-7-21
+- book: "Building a Second Brain: A Proven Method to Organize Your Digital Life and Unlock Your Creative Potential (2022)"
+  author: Tiago Forte
+  content: It’s important to keep capturing relatively effortless because it is only the first step.
+  date: 2022-12-18
+- book: "Building a Second Brain: A Proven Method to Organize Your Digital Life and Unlock Your Creative Potential (2022)"
+  author: Tiago Forte
+  content: "Allen recommends using a Weekly Review to write down any new to-dos, review your active projects, and decide on priorities for the upcoming week. I suggest adding one more step: review the notes you’ve created over the past week, give them succinct titles that tell you what’s inside, and sort them into the appropriate PARA folders. Most notes apps have an “inbox” of some kind where new notes collect until they’re ready to be reviewed. This “batch processing” takes only seconds per note, and you can complete it within a few minutes."
+  date: 2022-12-20
+
