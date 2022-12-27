@@ -2,3 +2,4 @@
 # Failed snapshots
 *.snap.new
 /coverage
+.env
