@@ -10,10 +10,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Clip {
-    book: String,
-    author: String,
-    content: String,
-    date: String,
+    pub book: String,
+    pub author: String,
+    pub content: String,
+    pub date: String,
 }
 
 pub fn parse_clips(input: &str) -> Vec<Clip> {
