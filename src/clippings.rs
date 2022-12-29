@@ -9,18 +9,33 @@ use phf::phf_map;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct BookClips {
+    pub book_name: String,
+    pub author: String,
+    pub clips: Vec<Clip>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Clip {
     pub book: String,
     pub author: String,
     pub content: String,
     pub date: String,
+    // TODO Add location
 }
 
-pub fn parse_clips(input: &str) -> Vec<Clip> {
-    let (_, result) = separated_list0(tag("==========\n"), nom_single_clip)(input)
+pub fn parse_clips(input: &str) -> Vec<BookClips> {
+    let (_, clips) = separated_list0(tag("==========\n"), nom_single_clip)(input)
         .expect("Could not parse clippings");
 
-    result
+    clips
+        .group_by(|a, b| a.book == b.book && a.author == b.author)
+        .map(|clips| BookClips {
+            book_name: clips[0].book.clone(),
+            author: clips[0].author.clone(),
+            clips: Vec::from(clips),
+        })
+        .collect()
 }
 
 fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
@@ -61,19 +76,19 @@ fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
     ))
 }
 
-static MONTHS: phf::Map<&'static str, u8> = phf_map! {
-    "January" => 1,
-    "February" => 2,
-    "March" => 3,
-    "April" => 4,
-    "May" => 5,
-    "June" => 6,
-    "July" => 7,
-    "August" => 8,
-    "September" => 9,
-    "October" => 10,
-    "November" => 11,
-    "December" => 12,
+static MONTHS: phf::Map<&'static str, &str> = phf_map! {
+    "January" => "01",
+    "February" => "02",
+    "March" => "03",
+    "April" => "04",
+    "May" => "05",
+    "June" => "06",
+    "July" => "07",
+    "August" => "08",
+    "September" => "09",
+    "October" => "10",
+    "November" => "11",
+    "December" => "12",
 };
 
 fn parse_date(input: &str) -> IResult<&str, String> {
