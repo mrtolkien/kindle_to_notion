@@ -81,63 +81,42 @@ impl BookClips {
         }));
 
         for clip in &self.clips {
-            let mut split_content = Vec::new();
-            let mut current_content = String::new();
+            // TODO Fix two issues: 2000 char max/block, and 100 blocks max/page
+            // -> Make each quote into a row in a database???
+            if clip.content.len() > 2000 {
+                println!("Skipping clip because it's too long: {:?}", clip.content);
+                continue;
+            }
 
-            // RE-CHECK WHY THIS IS NEEDED, 2000 characters is HUGE wtf
-            for phrase in clip.content.split_inclusive(". ") {
-                // We split every 1800 characters to leave space for the date
-                if current_content.len() + phrase.len() > 1800 {
-                    split_content.push(current_content);
-                    current_content = String::from(phrase);
-                // Else we just grow the content and add the dot back
-                } else {
-                    current_content.push_str(phrase);
+            children.push(json!({
+                "object": "block",
+                "type": "quote",
+                "quote": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": format!("{}\n", clip.content)
+                                }
+                        },
+                        {
+                            "type": "mention",
+                            "mention":{
+                                "type": "date",
+                                "date": {
+                                    "start": clip.date,
+                                }
+                            }
+                        }
+                    }
                 }
-            }
+            ));
 
-            // Adding the remainder (usually the whole content)
-            split_content.push(current_content);
-
-            // We iterate on content blocks
-            for (idx, content) in split_content.iter().enumerate() {
-                let quote_content = if idx < split_content.len() - 1 {
-                    // First part of quote: no line jump or date
-                    json!([{
-                        "type": "text",
-                        "text": {
-                            "content": format!("{}", content)
-                            }
-                    }])
-                } else {
-                    // Second part of quote: line jump and date
-                    json!([{
-                        "type": "text",
-                        "text": {
-                            "content": format!("{}\n", content)
-                            }
-                    },
-                    {
-                        "type": "mention",
-                        "mention":{
-                            "type": "date",
-                            "date": {
-                                "start": clip.date,
-                            }
-                        }
-                    }
-                    ])
-                };
-
-                children.push(json!({
-                    "object": "block",
-                    "type": "quote",
-                    "quote": {
-                        "rich_text": quote_content
-                        }
-                    }
-                ))
-            }
+            children.push(json!({
+                "object": "block",
+                "type": "divider",
+                "divider": {}
+            }));
         }
 
         NotionBookPage {
