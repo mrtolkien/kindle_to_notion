@@ -3,6 +3,7 @@ on:
     types: [created]
 
 jobs:
+  # TODO This doesn't work with unstable features!
   release:
     name: release ${{ matrix.target }}
     runs-on: ubuntu-latest
