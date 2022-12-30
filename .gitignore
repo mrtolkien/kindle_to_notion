@@ -3,3 +3,4 @@
 *.snap.new
 /coverage
 .env
+/documents

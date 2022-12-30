@@ -51,6 +51,13 @@ impl BookClips {
         }));
 
         for clip in &self.clips {
+            // TODO Fix two issues: 2000 char max/block, and 100 blocks max/page
+            // -> Make each quote into a row in a database???
+            if clip.content.len() > 2000 {
+                println!("Skipping clip because it's too long: {:?}", clip.content);
+                continue;
+            }
+
             children.push(json!({
                 "object": "block",
                 "type": "quote",
@@ -74,7 +81,13 @@ impl BookClips {
                         ]
                     }
                 }
-            ))
+            ));
+
+            children.push(json!({
+                "object": "block",
+                "type": "divider",
+                "divider": {}
+            }));
         }
 
         NotionBookPage {

@@ -2,10 +2,10 @@
 source: src/clippings.rs
 expression: parsed_clippings
 ---
-- book_name: How to Win Friends and Influence People
+- book_name: ﻿How to Win Friends and Influence People
   author: Dale Carnegie
   clips:
-    - book: How to Win Friends and Influence People
+    - book: ﻿How to Win Friends and Influence People
       author: Dale Carnegie
       content: "The old neighbour called at the White House, and Lincoln talked to him for hours about the advisability of issuing a proclamation freeing the slaves. Lincoln went over all the arguments for and against such a move, and then read letters and newspaper articles, some denouncing him for not freeing the slaves and others denouncing him for fear he was going to free them. After talking for hours, Lincoln shook hands with his old neighbour, said good night, and sent him back to Illinois without even asking for his opinion. Lincoln had done all the talking himself. That seemed to clarify his mind. ‘He seemed to feel easier after that talk,’ the old friend said. Lincoln hadn’t wanted advice. He had wanted merely a friendly, sympathetic listener to whom he could unburden himself."
       date: 2020-12-01

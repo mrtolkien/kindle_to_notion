@@ -25,8 +25,9 @@ pub struct Clip {
 }
 
 pub fn parse_clips(input: &str) -> Vec<BookClips> {
-    let (_, clips) = separated_list0(tag("==========\n"), nom_single_clip)(input)
-        .expect("Could not parse clippings");
+    let (_, clips) =
+        separated_list0(tuple((tag("=========="), line_ending)), nom_single_clip)(input)
+            .expect("Could not parse clippings");
 
     clips
         .group_by(|a, b| a.book == b.book && a.author == b.author)
@@ -67,7 +68,7 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
 fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
     let (input, (book, author)) = many_till(
         take(1_usize),
-        delimited(tag(" ("), take_until(")"), tag(")\n")),
+        delimited(tag(" ("), take_until(")"), tuple((tag(")"), line_ending))),
     )(input)?;
 
     Ok((
