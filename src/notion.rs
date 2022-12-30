@@ -26,6 +26,35 @@ impl BookClips {
         // TODO Use strongly typed JSON everywhere to make it easier, it's a bit disgusting here
         let mut children = Vec::new();
 
+        // We split on : if it's in the name, as it's usually ridiculously long books names then
+        let page_name = if self.book_name.split(":").count() == 1 {
+            // If there's no : in the name, it's simply the book's name
+            &self.book_name
+        } else {
+            // We add the full name as callout
+            children.push(json!({
+                "object": "block",
+                "type": "callout",
+                "callout": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": self.book_name,
+                            },
+                        }
+                    ],
+                    "icon": {
+                        "emoji": "📕"
+                    },
+                    "color": "default"
+                }
+            }));
+
+            // We return the first part of the string
+            self.book_name.split(":").next().unwrap()
+        };
+
         children.push(json!({
             "object": "block",
             "type": "callout",
@@ -120,7 +149,7 @@ impl BookClips {
                 "title": [
                         {
                             "text": {
-                                "content": self.book_name
+                                "content": page_name
                             }
                         }
                     ]
