@@ -21,7 +21,8 @@ fn main() {
     let parent_page_id = env::var("NOTION_PAGE_ID").expect("NOTION_PAGE_ID env variable not set");
 
     // Uploading to Notion
-    notion::upload_to_notion(api_key, parent_page_id, clips).expect("Failed to upload to Notion");
+    notion::upload_to_notion(api_key, parent_page_id, books_clips)
+        .expect("Failed to upload to Notion");
 
     // TODO Add a CLI option to archive the clippings
 }
