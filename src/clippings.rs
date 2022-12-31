@@ -24,6 +24,26 @@ pub struct Clip {
     // TODO Add location
 }
 
+/// Parses a Kindle clippings file into a vector of `BookClips`
+/// # Variables
+/// * `input` - The input string to parse
+/// # Returns
+/// * `Vec<BookClips>` - The parsed clippings
+/// # Example
+/// ```
+/// use kindle_to_notion::clippings;
+/// let clippings_text = "The Lord of the Rings (J. R. R. Tolkien)
+/// - Your Highlight on Location 1234-1235 | Added on Monday, 1 January 2021 00:00:00
+///
+/// This is a clip
+/// ==========
+/// The Lord of the Rings (J. R. R. Tolkien)
+/// - Your Highlight on Location 5678-5678 | Added on Tuesday, 2 January 2021 00:00:00
+///
+/// This is another clip";
+///
+/// let books_clips = clippings::parse_clips(clippings_text);
+/// ```
 pub fn parse_clips(input: &str) -> Vec<BookClips> {
     let (_, clips) =
         separated_list0(tuple((tag("=========="), line_ending)), nom_single_clip)(input)
@@ -39,6 +59,18 @@ pub fn parse_clips(input: &str) -> Vec<BookClips> {
         .collect()
 }
 
+/// Uses nom to parse a single clip, delimited by `==========`
+/// # Variables
+/// * `input` - The input string to parse
+///   * Example:
+/// ```text
+/// The Lord of the Rings (J. R. R. Tolkien)
+///  - Your Highlight on Location 1234-1235 | Added on Monday, 1 January 2021 00:00:00
+///
+/// This is a clip
+/// ```
+/// # Returns
+/// * `IResult<&str, Clip>` - Input remainder + The parsed clip struct
 fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
     let (input, ((book, author), _, raw_date, content)) = tuple((
         nom_first_row,
@@ -65,7 +97,13 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
     ))
 }
 
-fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
+/// Uses nom to parse the first row of a clip, which contains the book name and the author
+/// # Variables
+/// * `input` - The input string to parse
+///    * Example: `The Lord of the Rings (J. R. R. Tolkien)`
+/// # Returns
+/// * `IResult<&str, (String, &str)>` - Input remainder + The parsed book name and author
+pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
     let (input, (book, author)) = many_till(
         take(1_usize),
         delimited(tag(" ("), take_until(")"), tuple((tag(")"), line_ending))),
@@ -92,6 +130,12 @@ static MONTHS: phf::Map<&'static str, &str> = phf_map! {
     "December" => "12",
 };
 
+/// Parses a date from the format `1 January 2021`
+/// # Variables
+/// * `input` - The input string to parse
+///   * Example: `1 January 2021`
+/// # Returns
+/// * `IResult<&str, String>` - Input remainder + The parsed date in the format `YYYY-MM-DD`
 fn parse_date(input: &str) -> IResult<&str, String> {
     let (input, day) = digit1(input)?;
 
@@ -121,7 +165,6 @@ mod tests {
     use super::*;
     use std::fs;
 
-    // TODO Check insta VS code extension: https://marketplace.visualstudio.com/items?itemName=mitsuhiko.insta
     fn get_test_clippings() -> String {
         fs::read_to_string("tests/data/clippings.txt").expect("Test file not found")
     }
