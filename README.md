@@ -12,6 +12,7 @@ NOTION_PAGE_ID=...
 ## Usage
 
 - Create a Notion API "Internal integration" at <https://www.notion.so/my-integrations> with read, update, and insert content capabilities
+- Give it access to the page you want to use as parent to your clippings pages
 - Download and save the [latest release binary from the releases page](https://github.com/mrtolkien/kindle_to_notion/releases) to the root of your Kindle
 - Create a `.env` file at the root of your Kindle with the same structure as [this example `.env` file](https://github.com/mrtolkien/kindle_to_notion/blob/main/.env.example)
   - `NOTION_API_KEY` is the API key for your integration
