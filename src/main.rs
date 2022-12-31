@@ -1,4 +1,3 @@
-use dotenvy;
 use std::path::PathBuf;
 use std::{env, fs};
 
@@ -9,12 +8,12 @@ fn main() {
     dotenvy::dotenv().expect(".env file not found");
 
     // Reading the clippings
-    // TODO Add a CLI option to specify the clippings file
+    // TODO Add a CLI option to specify a different clippings file
     let file_path: PathBuf = ["documents", "My Clippings.txt"].iter().collect();
     let clippings_text = fs::read_to_string(file_path).expect("{file_path} file not found");
 
     // Creating our clips data
-    let clips = clippings::parse_clips(clippings_text.as_str());
+    let books_clips = clippings::parse_clips(clippings_text.as_str());
 
     // Reading the environment variables for Notion
     let api_key = env::var("NOTION_API_KEY").expect("NOTION_API_KEY env variable not set");
@@ -24,5 +23,6 @@ fn main() {
     notion::upload_to_notion(api_key, parent_page_id, books_clips)
         .expect("Failed to upload to Notion");
 
-    // TODO Add a CLI option to archive the clippings
+    // Archiving the clippings
+    // TODO Add a CLI option to not archive the clippings
 }
