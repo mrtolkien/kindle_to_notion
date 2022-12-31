@@ -1,16 +1,11 @@
-use std::str::FromStr;
-
 use crate::clippings::BookClips;
 use anyhow::Result;
-use reqwest::header::{HeaderMap, HeaderName};
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use reqwest::{self, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 const NOTION_API_URL: &str = "https://api.notion.com/v1/pages";
-
-const NOTION_API_VERSION_HEADER: &str = "Notion-Version";
-const NOTION_API_VERSION: &str = "2022-06-28";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct NotionBookPage {
@@ -27,7 +22,7 @@ impl BookClips {
         let mut children = Vec::new();
 
         // We split on : if it's in the name, as it's usually ridiculously long books names then
-        let page_name = if self.book_name.split(":").count() == 1 {
+        let page_name = if self.book_name.split(':').count() == 1 {
             // If there's no : in the name, it's simply the book's name
             &self.book_name
         } else {
@@ -52,7 +47,7 @@ impl BookClips {
             }));
 
             // We return the first part of the string
-            self.book_name.split(":").next().unwrap()
+            self.book_name.split(':').next().unwrap()
         };
 
         children.push(json!({
@@ -106,7 +101,7 @@ impl BookClips {
                     json!([{
                         "type": "text",
                         "text": {
-                            "content": format!("{}", content)
+                            "content": format!("{content}")
                             }
                     }])
                 } else {
@@ -114,7 +109,7 @@ impl BookClips {
                     json!([{
                         "type": "text",
                         "text": {
-                            "content": format!("{}\n", content)
+                            "content": format!("{content}\n")
                             }
                     },
                     {
@@ -166,10 +161,12 @@ pub fn upload_to_notion(
 ) -> Result<()> {
     let client = reqwest::blocking::Client::new();
 
-    // TODO Cleanup if that works
+    // Defining custom headers
     let mut headers = HeaderMap::new();
-    let header_name = HeaderName::from_str(NOTION_API_VERSION_HEADER)?;
-    headers.insert(header_name, NOTION_API_VERSION.parse()?);
+    headers.insert(
+        HeaderName::from_static("Notion-Version"),
+        HeaderValue::from_static("2022-06-28"),
+    );
 
     for book in books_clips {
         println!("Uploading clips from {:?}", book.book_name);
