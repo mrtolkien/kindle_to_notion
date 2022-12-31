@@ -20,10 +20,22 @@ NOTION_PAGE_ID=...
 
 ## Behaviour and limitations
 
-- TODO
-## Limitations
+- For each book which has clippings, a new page gets created inside the page with id `NOTION_PAGE_ID`
+- If the book name contains the `:` character, only the text before it is used for the page title
+  - The full book name is put in a callout at the beginning of the page
+- The book author gets his own callout block
+- Inside the page each clip is its own [quote block](https://www.notion.so/help/writing-and-editing-basics#types-of-content), finished with an inline date referencing the capture day
 
-<!-- TODO REMOVE DIVIDER BLOCK!!! -->
-<!-- TODO Add releases + how to use! -->
-- There can only be 100 blocks in a Notion page, so you need to have fewer quotes than this per book
-- Single blocks cannot be more than 2000 characters long, so longer quotes get split in multiple blocks
+- There can only be 100 blocks in a Notion page so this program won't work if you have over 100 quotes for a book
+
+### Database
+
+A database page can be used as the root. Each group of quotes will therefore be a database row.
+
+## Next steps
+
+If you want to give a shot, here are some example features that would be welcome additions:
+
+- Support for database properties
+- Support for updating existing quote pages
+- Support for different usage paradigms, for example 1 quote per page for databases
