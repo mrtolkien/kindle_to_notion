@@ -15,6 +15,8 @@ fn main() {
     // Creating our clips data
     let books_clips = clippings::parse_clips(clippings_text.as_str());
 
+    println!("Found {} books with clips", books_clips.len());
+
     // Reading the environment variables for Notion
     let api_key = env::var("NOTION_API_KEY").expect("NOTION_API_KEY env variable not set");
     let parent_page_id = env::var("NOTION_PAGE_ID").expect("NOTION_PAGE_ID env variable not set");
@@ -24,5 +26,6 @@ fn main() {
         .expect("Failed to upload to Notion");
 
     // Archiving the clippings
+    // TODO ARCHIVE
     // TODO Add a CLI option to not archive the clippings
 }

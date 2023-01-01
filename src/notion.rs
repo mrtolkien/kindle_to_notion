@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::clippings::BookClips;
 use anyhow::Result;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
@@ -117,6 +119,7 @@ impl BookClips {
                         "mention":{
                             "type": "date",
                             "date": {
+                                // TODO This is assumed as UTC when it's not
                                 "start": clip.date,
                             }
                         }
@@ -163,10 +166,16 @@ pub fn upload_to_notion(
 
     // Defining custom headers
     let mut headers = HeaderMap::new();
-    headers.insert(
-        HeaderName::from_static("Notion-Version"),
-        HeaderValue::from_static("2022-06-28"),
-    );
+
+    // TODO Cleanup if that works
+    let header_name = HeaderName::from_str("Notion-Version")?;
+    headers.insert(header_name, "2022-06-28".parse()?);
+
+    // TODO THERE WERE ISSUES HERE
+    // headers.insert(
+    //     HeaderName::from_static("Notion-Version"),
+    //     HeaderValue::from_static("2022-06-28"),
+    // );
 
     for book in books_clips {
         println!("Uploading clips from {:?}", book.book_name);

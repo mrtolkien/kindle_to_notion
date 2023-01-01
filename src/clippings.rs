@@ -89,7 +89,7 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
                     not_line_ending,
                     tuple((line_ending, line_ending)),
                 ),
-                |x| parse_date(x),
+                parse_date,
             ),
             terminated(not_line_ending, line_ending),
         ))(input)?;
