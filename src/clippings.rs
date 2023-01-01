@@ -1,7 +1,8 @@
-use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
+use chrono::NaiveDateTime;
 use nom::{
     bytes::complete::{tag, take, take_until},
     character::complete::{digit1, line_ending, not_line_ending},
+    combinator::map_parser,
     multi::{many_till, separated_list0},
     sequence::{delimited, terminated, tuple},
     IResult,
@@ -73,7 +74,7 @@ pub fn parse_clips(input: &str) -> Vec<BookClips> {
 /// # Returns
 /// * `IResult<&str, Clip>` - Input remainder + The parsed clip struct
 fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
-    let (input, ((book, author), (location_start, _, location_end), _, raw_date, content)) =
+    let (input, ((book, author), (location_start, _, location_end), _, date, content)) =
         tuple((
             nom_first_row,
             delimited(
@@ -82,16 +83,16 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
                 tag(" |"),
             ),
             take_until(", "),
-            delimited(
-                tag(", "),
-                not_line_ending,
-                tuple((line_ending, line_ending)),
+            map_parser(
+                delimited(
+                    tag(", "),
+                    not_line_ending,
+                    tuple((line_ending, line_ending)),
+                ),
+                |x| parse_date(x),
             ),
             terminated(not_line_ending, line_ending),
         ))(input)?;
-
-    // Parsing the date
-    let (_, date) = parse_date(raw_date)?;
 
     Ok((
         input,
@@ -132,8 +133,9 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
 ///   * Example: `1 January 2021 00:00:00`
 /// # Returns
 /// * `IResult<&str, String>` - Input remainder + The parsed date in the format `YYYY-MM-DD`
+/// # Note
+/// We use the IResult type here to integrate with nom
 fn parse_date(input: &str) -> IResult<&str, NaiveDateTime> {
-    // TODO Check if clippings use local time or UTC
     Ok((
         "",
         NaiveDateTime::parse_from_str(input, "%e %B %Y %H:%M:%S").expect("Cannot parse input"),
