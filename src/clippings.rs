@@ -20,8 +20,10 @@ pub struct Clip {
     pub book: String,
     pub author: String,
     pub content: String,
+    // TODO Make that into a real date object using chrono!
     pub date: String,
-    // TODO Add location
+    // Start/End locations
+    pub location: (usize, usize),
 }
 
 /// Parses a Kindle clippings file into a vector of `BookClips`
@@ -72,16 +74,22 @@ pub fn parse_clips(input: &str) -> Vec<BookClips> {
 /// # Returns
 /// * `IResult<&str, Clip>` - Input remainder + The parsed clip struct
 fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
-    let (input, ((book, author), _, raw_date, content)) = tuple((
-        nom_first_row,
-        take_until(", "),
-        delimited(
-            tag(", "),
-            not_line_ending,
-            tuple((line_ending, line_ending)),
-        ),
-        terminated(not_line_ending, line_ending),
-    ))(input)?;
+    let (input, ((book, author), (location_start, _, location_end), _, raw_date, content)) =
+        tuple((
+            nom_first_row,
+            delimited(
+                tag("- Your Highlight at location "),
+                tuple((digit1, take(1usize), digit1)),
+                tag(" |"),
+            ),
+            take_until(", "),
+            delimited(
+                tag(", "),
+                not_line_ending,
+                tuple((line_ending, line_ending)),
+            ),
+            terminated(not_line_ending, line_ending),
+        ))(input)?;
 
     // Parsing the date
     let (_, date) = parse_date(raw_date)?;
@@ -93,6 +101,10 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
             author: author.replace(')', ""),
             content: content.to_string(),
             date,
+            location: (
+                location_start.parse().expect("Not a valid integer"),
+                location_end.parse().expect("Not a valid integer"),
+            ),
         },
     ))
 }
