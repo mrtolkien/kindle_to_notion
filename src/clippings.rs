@@ -1,11 +1,11 @@
+use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use nom::{
     bytes::complete::{tag, take, take_until},
-    character::complete::{alpha1, digit1, line_ending, not_line_ending},
+    character::complete::{digit1, line_ending, not_line_ending},
     multi::{many_till, separated_list0},
     sequence::{delimited, terminated, tuple},
     IResult,
 };
-use phf::phf_map;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -20,8 +20,7 @@ pub struct Clip {
     pub book: String,
     pub author: String,
     pub content: String,
-    // TODO Make that into a real date object using chrono!
-    pub date: String,
+    pub date: NaiveDateTime,
     // Start/End locations
     pub location: (usize, usize),
 }
@@ -127,53 +126,24 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
     ))
 }
 
-static MONTHS: phf::Map<&'static str, &str> = phf_map! {
-    "January" => "01",
-    "February" => "02",
-    "March" => "03",
-    "April" => "04",
-    "May" => "05",
-    "June" => "06",
-    "July" => "07",
-    "August" => "08",
-    "September" => "09",
-    "October" => "10",
-    "November" => "11",
-    "December" => "12",
-};
-
-/// Parses a date from the format `1 January 2021`
+/// Parses a date from the format `1 January 2021 00:00:00`
 /// # Variables
 /// * `input` - The input string to parse
-///   * Example: `1 January 2021`
+///   * Example: `1 January 2021 00:00:00`
 /// # Returns
 /// * `IResult<&str, String>` - Input remainder + The parsed date in the format `YYYY-MM-DD`
-fn parse_date(input: &str) -> IResult<&str, String> {
-    let (input, day) = digit1(input)?;
-
-    let day = if day.len() == 1 {
-        // We pad with a 0
-        format!("0{day}")
-    } else {
-        day.to_string()
-    };
-
-    let (input, month) = delimited(tag(" "), alpha1, tag(" "))(input)?;
-    let (_, year) = digit1(input)?;
-
+fn parse_date(input: &str) -> IResult<&str, NaiveDateTime> {
+    // TODO Check if clippings use local time or UTC
     Ok((
         "",
-        format!(
-            "{}-{}-{}",
-            year,
-            MONTHS.get(month).expect("Month {month} not found"),
-            day
-        ),
+        NaiveDateTime::parse_from_str(input, "%e %B %Y %H:%M:%S").expect("Cannot parse input"),
     ))
 }
 
 #[cfg(test)]
 mod tests {
+    use chrono::NaiveDate;
+
     use super::*;
     use std::fs;
 
@@ -184,9 +154,16 @@ mod tests {
     #[test]
     fn test_parse_date() {
         let test_date = "1 December 2020 16:58:58";
+
         let (_, parsed_date) = parse_date(test_date).unwrap();
 
-        assert_eq!(parsed_date, "2020-12-01");
+        assert_eq!(
+            parsed_date,
+            NaiveDate::from_ymd_opt(2020, 12, 1)
+                .unwrap()
+                .and_hms_micro_opt(16, 58, 58, 0)
+                .unwrap()
+        );
     }
 
     #[test]
