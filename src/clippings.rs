@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Local, TimeZone};
 use nom::{
     bytes::complete::{tag, take, take_until},
     character::complete::{digit1, line_ending, not_line_ending},
@@ -21,7 +21,7 @@ pub struct Clip {
     pub book: String,
     pub author: String,
     pub content: String,
-    pub date: NaiveDateTime,
+    pub date: DateTime<Local>,
     // Start/End locations
     pub location: (usize, usize),
 }
@@ -135,17 +135,17 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
 /// * `IResult<&str, String>` - Input remainder + The parsed date in the format `YYYY-MM-DD`
 /// # Note
 /// We use the IResult type here to integrate with nom
-fn parse_date(input: &str) -> IResult<&str, NaiveDateTime> {
+fn parse_date(input: &str) -> IResult<&str, DateTime<Local>> {
     Ok((
         "",
-        NaiveDateTime::parse_from_str(input, "%e %B %Y %H:%M:%S").expect("Cannot parse input"),
+        Local
+            .datetime_from_str(input, "%e %B %Y %H:%M:%S")
+            .expect("Cannot parse input"),
     ))
 }
 
 #[cfg(test)]
 mod tests {
-    use chrono::NaiveDate;
-
     use super::*;
     use std::fs;
 
@@ -161,10 +161,7 @@ mod tests {
 
         assert_eq!(
             parsed_date,
-            NaiveDate::from_ymd_opt(2020, 12, 1)
-                .unwrap()
-                .and_hms_micro_opt(16, 58, 58, 0)
-                .unwrap()
+            Local.with_ymd_and_hms(2020, 12, 1, 16, 58, 58).unwrap()
         );
     }
 
