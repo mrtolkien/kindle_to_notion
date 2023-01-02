@@ -10,10 +10,10 @@ fn main() {
     dotenvy::dotenv().expect(".env file not found");
 
     // Reading the clippings
-    let clippings_location: PathBuf = match env::var("CLIPPINGS_LOCATION") {
-        Ok(clippings_file) => PathBuf::from(clippings_file),
-        Err(_) => ["documents", "My Clippings.txt"].iter().collect(),
-    };
+    let clippings_location: PathBuf = env::var("CLIPPINGS_LOCATION").map_or_else(
+        |_| ["documents", "My Clippings.txt"].iter().collect(),
+        PathBuf::from,
+    );
 
     let clippings_text =
         fs::read_to_string(&clippings_location).expect("{file_path} file not found");
@@ -32,13 +32,11 @@ fn main() {
         .expect("Failed to upload to Notion");
 
     // Archiving the clippings
-    match env::var("DONT_ARCHIVE_CLIPPINGS") {
-        Ok(no_archive) => {
-            if no_archive == "true" {
-                return;
-            }
+    // We pass if DONT_ARCHIVE_CLIPPINGS is set to true
+    if let Ok(no_archive) = env::var("DONT_ARCHIVE_CLIPPINGS") {
+        if no_archive == "true" {
+            return;
         }
-        Err(_) => (),
     }
 
     fs::create_dir_all("clippings_archive").expect("Could not create clippings archive folder");
@@ -49,5 +47,5 @@ fn main() {
     .iter()
     .collect();
 
-    fs::rename(&clippings_location, &archive_location).expect("Could not archive clippings");
+    fs::rename(&clippings_location, archive_location).expect("Could not archive clippings");
 }

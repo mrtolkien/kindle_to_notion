@@ -184,34 +184,34 @@ enum BlockType {
     Quote,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Divider {}
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Callout {
     pub color: Color,
     pub icon: Icon,
     pub rich_text: Vec<RichText>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Quote {
     pub rich_text: Vec<RichText>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Color {
     #[default]
     Default,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Icon {
     pub emoji: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RichText {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<Text>,
@@ -221,22 +221,22 @@ pub struct RichText {
     pub type_field: TextType,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Text {
     pub content: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Mention {
     pub date: Option<Date>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Date {
     pub start: DateTime<Local>,
 }
 
-#[derive(Default, Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum TextType {
     #[default]
@@ -246,8 +246,10 @@ pub enum TextType {
 
 impl Child {
     pub fn new_callout(content: String, emoji: &str) -> Self {
-        let mut child = Child::default();
-        child.type_field = BlockType::Callout;
+        let mut child = Self {
+            type_field: BlockType::Callout,
+            ..Default::default()
+        };
 
         let mut callout = Callout {
             icon: Icon {
@@ -266,16 +268,17 @@ impl Child {
     }
 
     pub fn new_divider() -> Self {
-        let mut child = Child::default();
-
-        child.type_field = BlockType::Divider;
+        let mut child = Self {
+            type_field: BlockType::Divider,
+            ..Default::default()
+        };
         child.divider = Some(Divider::default());
 
         child
     }
 
     pub fn new_quote(content: String, date: Option<DateTime<Local>>) -> Self {
-        let mut child = Child::default();
+        let mut child = Self::default();
 
         let mut quote = Quote {
             rich_text: vec![RichText {
@@ -297,7 +300,7 @@ impl Child {
                     date: Some(Date { start: date }),
                 }),
                 ..Default::default()
-            })
+            });
         };
 
         child.quote = Some(quote);
