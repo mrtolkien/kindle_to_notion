@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::{env, fs};
 
+use chrono::Local;
 use kindle_to_notion::{clippings, notion};
 
 fn main() {
@@ -8,9 +9,13 @@ fn main() {
     dotenvy::dotenv().expect(".env file not found");
 
     // Reading the clippings
-    // TODO Add a CLI option to specify a different clippings file
-    let file_path: PathBuf = ["documents", "My Clippings.txt"].iter().collect();
-    let clippings_text = fs::read_to_string(file_path).expect("{file_path} file not found");
+    let clippings_location: PathBuf = match env::var("CLIPPINGS_LOCATION") {
+        Ok(clippings_file) => PathBuf::from(clippings_file),
+        Err(_) => ["documents", "My Clippings.txt"].iter().collect(),
+    };
+
+    let clippings_text =
+        fs::read_to_string(&clippings_location).expect("{file_path} file not found");
 
     // Creating our clips data
     let books_clips = clippings::parse_clips(clippings_text.as_str());
@@ -26,6 +31,22 @@ fn main() {
         .expect("Failed to upload to Notion");
 
     // Archiving the clippings
-    // TODO ARCHIVE
-    // TODO Add a CLI option to not archive the clippings
+    match env::var("DONT_ARCHIVE_CLIPPINGS") {
+        Ok(no_archive) => {
+            if no_archive == "true" {
+                return;
+            }
+        }
+        Err(_) => (),
+    }
+
+    fs::create_dir_all("clippings_archive").expect("Could not create clippings archive folder");
+    let archive_location: PathBuf = [
+        "clippings_archive",
+        format!("{}.txt", Local::now()).as_str(),
+    ]
+    .iter()
+    .collect();
+
+    fs::rename(&clippings_location, &archive_location).expect("Could not archive clippings");
 }

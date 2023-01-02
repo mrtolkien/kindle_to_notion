@@ -7,6 +7,9 @@ Small Rust program to parse Kindle clips and upload them to Notion.
 ```ini
 NOTION_API_KEY=...
 NOTION_PAGE_ID=...
+# Optional:
+CLIPPINGS_LOCATION="documents/My Clippings.txt"
+DONT_ARCHIVE_CLIPPINGS=true
 ```
 
 ## Usage
@@ -17,6 +20,9 @@ NOTION_PAGE_ID=...
 - Create a `.env` file at the root of your Kindle with the same structure as [this example `.env` file](https://github.com/mrtolkien/kindle_to_notion/blob/main/.env.example)
   - `NOTION_API_KEY` is the API key for your integration
   - `NOTION_PAGE_ID` is the page ID of the page where you want to insert your clippings pages
+  - Optional:
+    - `CLIPPINGS_LOCATION` is the location of the `My Clippings.txt` file relative to the program
+    - `DONT_ARCHIVE_CLIPPINGS` can be set to `true` to not move clippings after uploading
 - Run the executable from the root of your Kindle and see it populate
 
 ## Behaviour and limitations
@@ -27,6 +33,8 @@ NOTION_PAGE_ID=...
 - The book author gets his own callout block
 - Inside the page each clip is its own [quote block](https://www.notion.so/help/writing-and-editing-basics#types-of-content), finished with an inline date referencing the capture day
 - Each quote gets tagged with the clipping date/time, using the machine's local timezone
+- The clippings file gets moved to `clippings_archive` and name with the current ISO date time
+  - You can set `DONT_ARCHIVE_CLIPPINGS` to `true` in your `.env` file if you don't want to archive the clippings
 
 - There can only be 100 blocks in a Notion page so this program won't work if you have over 100 quotes for a book
 
