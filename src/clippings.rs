@@ -169,7 +169,7 @@ mod tests {
     fn test_parse_first_row() {
         let first_row = "Building... (NEW) (2022) (Tiago Forte)
 ";
-        let (_, (author, book)) = nom_first_row(first_row).unwrap();
+        let (_, (author, book)) = nom_first_row(first_row).expect("Could not nom first row");
 
         assert_eq!(author, "Building... (NEW) (2022)");
         assert_eq!(book, "Tiago Forte");
@@ -182,7 +182,7 @@ mod tests {
 
 The old neighbour called at the White House, and Lincoln talked to him for hours about the advisability of issuing a proclamation freeing the slaves. Lincoln went over all the arguments for and against such a move, and then read letters and newspaper articles, some denouncing him for not freeing the slaves and others denouncing him for fear he was going to free them. After talking for hours, Lincoln shook hands with his old neighbour, said good night, and sent him back to Illinois without even asking for his opinion. Lincoln had done all the talking himself. That seemed to clarify his mind. ‘He seemed to feel easier after that talk,’ the old friend said. Lincoln hadn’t wanted advice. He had wanted merely a friendly, sympathetic listener to whom he could unburden himself.
 ";
-        let (_, parsed_clip) = nom_single_clip(test_clip).unwrap();
+        let (_, parsed_clip) = nom_single_clip(test_clip).expect("Could not nom clip");
         insta::assert_yaml_snapshot!(parsed_clip);
     }
 
@@ -193,7 +193,8 @@ The old neighbour called at the White House, and Lincoln talked to him for hours
 
 It’s important to keep capturing relatively effortless because it is only the first step.
 ";
-        let (_, parsed_clip) = nom_single_clip(test_clip).unwrap();
+        let (_, parsed_clip) =
+            nom_single_clip(test_clip).expect("Could not nome clip with parenthesis in title");
         insta::assert_yaml_snapshot!(parsed_clip);
     }
 

@@ -17,7 +17,7 @@ struct NotionBookPage {
 
 // Creating our clip function that uses the parent
 impl BookClips {
-    fn to_notion_body(&self, parent_page_id: String) -> NotionBookPage {
+    fn to_notion_body(&self, parent_page_id: &str) -> NotionBookPage {
         // TODO Use strongly typed JSON everywhere to make it easier, it's a bit disgusting here
         let mut children = Vec::new();
 
@@ -47,7 +47,10 @@ impl BookClips {
             }));
 
             // We return the first part of the string
-            self.book_name.split(':').next().unwrap()
+            self.book_name
+                .split(':')
+                .next()
+                .unwrap_or_else(|| unreachable!())
         };
 
         children.push(json!({
@@ -131,7 +134,7 @@ impl BookClips {
                         "rich_text": quote_content
                         }
                     }
-                ))
+                ));
             }
         }
 
@@ -154,9 +157,19 @@ impl BookClips {
     }
 }
 
-pub fn upload_to_notion(
-    api_key: String,
-    parent_page_id: String,
+/// Uploads the book clips to Notion
+///
+/// # Arguments
+///
+/// * `api_key` - The Notion API key
+/// * `parent_page_id` - The ID of the parent page where the clips pages will be created
+/// * `books_clips` - The list of book clips to upload
+///
+/// # Errors
+/// Raise on HTTP errors from the API call to Notion
+pub fn upload_clips(
+    api_key: &str,
+    parent_page_id: &str,
     books_clips: Vec<BookClips>,
 ) -> Result<()> {
     let client = reqwest::blocking::Client::new();
@@ -173,9 +186,9 @@ pub fn upload_to_notion(
 
         let res = client
             .post(NOTION_API_URL)
-            .bearer_auth(api_key.clone())
+            .bearer_auth(api_key)
             .headers(headers.clone())
-            .json(&book.to_notion_body(parent_page_id.clone()))
+            .json(&book.to_notion_body(parent_page_id))
             .send()?;
 
         match res.status() {
