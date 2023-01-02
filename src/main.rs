@@ -5,6 +5,7 @@ use chrono::Local;
 use kindle_to_notion::{clippings, notion};
 
 fn main() {
+    // TODO Move all the logic to `lib.rs` instead
     // For simplicity, the conf is read from a .env file at the moment
     dotenvy::dotenv().expect(".env file not found");
 
