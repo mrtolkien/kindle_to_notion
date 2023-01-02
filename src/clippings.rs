@@ -127,7 +127,13 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
 
     Ok((
         input,
-        (book.iter().fold(String::new(), |acc, x| acc + x), author),
+        (
+            book.iter()
+                // Removing BOM character if present
+                .filter(|x| **x != '\u{feff}'.to_string())
+                .fold(String::new(), |acc, x| acc + x),
+            author,
+        ),
     ))
 }
 
