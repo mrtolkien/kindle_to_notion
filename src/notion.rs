@@ -38,7 +38,7 @@ pub fn upload_clips(
             .post(NOTION_API_URL)
             .bearer_auth(api_key)
             .headers(headers.clone())
-            .json(&book.to_notion_body(parent_page_id))
+            .json(&book.create_page_query(parent_page_id))
             .send()?;
 
         match res.status() {
@@ -57,9 +57,9 @@ pub fn upload_clips(
     Ok(())
 }
 
-// Creating our clip function that uses the parent
+// Creating a Book's clippings JSON request to Notion
 impl BookClips {
-    fn to_notion_body(&self, parent_page_id: &str) -> NotionPageQuery {
+    fn create_page_query(&self, parent_page_id: &str) -> NotionPageQuery {
         let mut children = Vec::new();
 
         // We split on : if it's in the name, as it's usually ridiculously long books names then
