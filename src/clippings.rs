@@ -2,7 +2,7 @@ use chrono::{DateTime, Local, TimeZone};
 use nom::{
     bytes::complete::{tag, take, take_until},
     character::complete::{digit1, line_ending, not_line_ending},
-    combinator::map_parser,
+    combinator::map,
     multi::{many_till, separated_list0},
     sequence::{delimited, terminated, tuple},
     IResult,
@@ -73,6 +73,8 @@ pub fn parse_clips(input: &str) -> Vec<BookClips> {
 /// ```
 /// # Returns
 /// * `IResult<&str, Clip>` - Input remainder + The parsed clip struct
+/// # Errors
+/// * `IResult::Error` - If the input cannot be parsed
 fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
     let (input, ((book, author), (location_start, _, location_end), _, date, content)) =
         tuple((
@@ -83,7 +85,7 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
                 tag(" |"),
             ),
             take_until(", "),
-            map_parser(
+            map(
                 delimited(
                     tag(", "),
                     not_line_ending,
@@ -115,6 +117,8 @@ fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
 ///    * Example: `The Lord of the Rings (J. R. R. Tolkien)`
 /// # Returns
 /// * `IResult<&str, (String, &str)>` - Input remainder + The parsed book name and author
+/// # Errors
+/// * `IResult::Error` - If the input cannot be parsed
 pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
     let (input, (book, author)) = many_till(
         take(1_usize),
@@ -134,14 +138,10 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
 /// # Returns
 /// * `IResult<&str, String>` - Input remainder + The parsed date in the format `YYYY-MM-DD`
 /// # Note
-/// We use the IResult type here to integrate with nom
-fn parse_date(input: &str) -> IResult<&str, DateTime<Local>> {
-    Ok((
-        "",
-        Local
-            .datetime_from_str(input, "%e %B %Y %H:%M:%S")
-            .expect("Cannot parse input"),
-    ))
+fn parse_date(input: &str) -> DateTime<Local> {
+    Local
+        .datetime_from_str(input, "%e %B %Y %H:%M:%S")
+        .expect("Cannot parse input")
 }
 
 #[cfg(test)]
@@ -157,7 +157,7 @@ mod tests {
     fn test_parse_date() {
         let test_date = "1 December 2020 16:58:58";
 
-        let (_, parsed_date) = parse_date(test_date).unwrap();
+        let parsed_date = parse_date(test_date);
 
         assert_eq!(
             parsed_date,
