@@ -34,7 +34,7 @@ CLIPPINGS_LOCATION="documents/My Clippings.txt"
 - The book author gets his own callout block
 - Inside the page each clip is its own [quote block](https://www.notion.so/help/writing-and-editing-basics#types-of-content), finished with an inline date referencing the capture day
 - Each quote gets tagged with the clipping date/time, using the machine's local timezone
-- `==========` gets appended to the file to mark where the parsing ended
+- `#==========` gets appended to the file to mark where the parsing ended
 
 - There can only be 100 blocks in a Notion page so this program won't work if you have over 100 quotes for a book
 
