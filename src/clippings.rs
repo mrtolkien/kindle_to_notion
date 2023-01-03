@@ -138,8 +138,8 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
         input,
         (
             book.iter()
-                // Removing BOM character if present
-                .filter(|x| **x != '\u{feff}'.to_string())
+                // Removing BOM character and line jumps if present
+                .filter(|x| **x != '\u{feff}'.to_string() && **x != '\n'.to_string())
                 .fold(String::new(), |acc, x| acc + x),
             author,
         ),

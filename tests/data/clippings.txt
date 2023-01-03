@@ -3,8 +3,7 @@
 
 Clippings before the double ========== lines should not get caught
 ==========
-#
-==========
+#==========
 How to Win Friends and Influence People (Dale Carnegie)
 - Your Highlight at location 1502-1507 | Added on Tuesday, 1 December 2020 16:58:58
 
