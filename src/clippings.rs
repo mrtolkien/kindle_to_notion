@@ -47,6 +47,13 @@ pub struct Clip {
 /// let books_clips = clippings::parse_clips(clippings_text);
 /// ```
 pub fn parse_clips(input: &str) -> Vec<BookClips> {
+    // We use ==========\n========== to mark previously finished parsing jobs
+    // So we split on this marker and take everything after it
+    let input = input
+        .split("==========\n==========\n")
+        .last()
+        .unwrap_or_else(|| unreachable!("A string is always splittable"));
+
     let (_, clips) =
         separated_list0(tuple((tag("=========="), line_ending)), nom_single_clip)(input)
             .expect("Could not parse clippings");

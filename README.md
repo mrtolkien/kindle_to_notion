@@ -9,7 +9,6 @@ NOTION_API_KEY=...
 NOTION_PAGE_ID=...
 # Optional:
 CLIPPINGS_LOCATION="documents/My Clippings.txt"
-DONT_ARCHIVE_CLIPPINGS=true
 ```
 
 ## Usage
@@ -22,7 +21,6 @@ DONT_ARCHIVE_CLIPPINGS=true
   - `NOTION_PAGE_ID` is the page ID of the page where you want to insert your clippings pages
   - Optional:
     - `CLIPPINGS_LOCATION` is the location of the `My Clippings.txt` file relative to the program
-    - `DONT_ARCHIVE_CLIPPINGS` can be set to `true` to not move clippings after uploading
 - Run the executable from the root of your Kindle and see it populate
 
 ## Behaviour and limitations
@@ -33,8 +31,7 @@ DONT_ARCHIVE_CLIPPINGS=true
 - The book author gets his own callout block
 - Inside the page each clip is its own [quote block](https://www.notion.so/help/writing-and-editing-basics#types-of-content), finished with an inline date referencing the capture day
 - Each quote gets tagged with the clipping date/time, using the machine's local timezone
-- The clippings file gets moved to `clippings_archive` and name with the current ISO date time
-  - You can set `DONT_ARCHIVE_CLIPPINGS` to `true` in your `.env` file if you don't want to archive the clippings
+- `==========` gets appended to the file to mark where the parsing ended
 
 - There can only be 100 blocks in a Notion page so this program won't work if you have over 100 quotes for a book
 
