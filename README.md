@@ -2,6 +2,8 @@
 
 Small Rust program to parse Kindle clips and upload them to Notion.
 
+![Clip example](docs/images/clip.png)
+
 ## Env variables
 
 ```ini
@@ -19,6 +21,7 @@ CLIPPINGS_LOCATION="documents/My Clippings.txt"
 - Create a `.env` file at the root of your Kindle with the same structure as [this example `.env` file](https://github.com/mrtolkien/kindle_to_notion/blob/main/.env.example)
   - `NOTION_API_KEY` is the API key for your integration
   - `NOTION_PAGE_ID` is the page ID of the page where you want to insert your clippings pages
+    - You can get it by checking the page link from the web app or the `Share` menu on Desktop
   - Optional:
     - `CLIPPINGS_LOCATION` is the location of the `My Clippings.txt` file relative to the program
 - Run the executable from the root of your Kindle and see it populate
