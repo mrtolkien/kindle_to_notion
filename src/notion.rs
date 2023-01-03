@@ -20,7 +20,7 @@ const NOTION_API_URL: &str = "https://api.notion.com/v1/pages";
 pub fn upload_clips(
     api_key: &str,
     parent_page_id: &str,
-    books_clips: Vec<BookClips>,
+    books_clips: &Vec<BookClips>,
 ) -> Result<()> {
     let client = reqwest::blocking::Client::new();
 

@@ -50,14 +50,16 @@ pub fn parse_clips(input: &str) -> Vec<BookClips> {
     // We use ==========\n========== to mark previously finished parsing jobs
     // So we split on this marker and take everything after it
     let input = input
-        .split("==========\n==========\n")
+        .split("#==========")
         .last()
         .unwrap_or_else(|| unreachable!("A string is always splittable"));
 
+    // We parse all the clips with nom
     let (_, clips) =
         separated_list0(tuple((tag("=========="), line_ending)), nom_single_clip)(input)
             .expect("Could not parse clippings");
 
+    // We group clips by book and author
     clips
         .group_by(|a, b| a.book == b.book && a.author == b.author)
         .map(|clips| BookClips {

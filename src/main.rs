@@ -30,15 +30,19 @@ fn main() {
     let parent_page_id = env::var("NOTION_PAGE_ID").expect("NOTION_PAGE_ID env variable not set");
 
     // Uploading to Notion
-    notion::upload_clips(api_key.as_str(), parent_page_id.as_str(), books_clips)
+    notion::upload_clips(api_key.as_str(), parent_page_id.as_str(), &books_clips)
         .expect("Failed to upload to Notion");
 
-    // Marking the end of the clippings
+    // Marking the end of the clippings only if clips were found
+    if books_clips.len() == 0 {
+        return;
+    }
+
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
         .open(&clippings_location)
         .expect("Could not open clippings file as appendable");
 
-    writeln!(file, "==========").expect("Could not write to clippings file");
+    writeln!(file, "#==========").expect("Could not write to clippings file");
 }
