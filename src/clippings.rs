@@ -85,25 +85,25 @@ pub fn parse_clips(input: &str) -> Vec<BookClips> {
 /// # Errors
 /// * `IResult::Error` - If the input cannot be parsed
 fn nom_single_clip(input: &str) -> IResult<&str, Clip> {
-    let (input, ((book, author), (location_start, _, location_end), _, date, content)) =
-        tuple((
-            nom_first_row,
+    let (input, ((book, author), (location_start, location_end), _, date, content)) = tuple((
+        // Book name and author
+        nom_first_row,
+        // Location
+        nom_location_2023_02,
+        // Removing the " | Added on " part
+        take_until(", "),
+        // Date
+        map(
             delimited(
-                tag("- Your Highlight at location "),
-                tuple((digit1, take(1usize), digit1)),
-                tag(" |"),
+                tag(", "),
+                not_line_ending,
+                tuple((line_ending, line_ending)),
             ),
-            take_until(", "),
-            map(
-                delimited(
-                    tag(", "),
-                    not_line_ending,
-                    tuple((line_ending, line_ending)),
-                ),
-                parse_date,
-            ),
-            terminated(not_line_ending, line_ending),
-        ))(input)?;
+            parse_date,
+        ),
+        // Content
+        terminated(not_line_ending, line_ending),
+    ))(input)?;
 
     Ok((
         input,
@@ -144,6 +144,46 @@ pub fn nom_first_row(input: &str) -> IResult<&str, (String, &str)> {
             author,
         ),
     ))
+}
+
+/// Uses nom to parse the location of a clip
+/// -> OBSOLETE and not used anymore atm
+/// # Variables
+/// * `input` - The input string to parse
+///  * Example: - Your Highlight at location 1502-1507 |
+/// # Returns
+/// * `IResult<&str, (&str, &str)>` - Input remainder + The parsed start and end location
+/// # Errors
+/// * `IResult::Error` - If the input cannot be parsed
+pub fn nom_location_old(input: &str) -> IResult<&str, (&str, &str)> {
+    let (input, (location_start, _, location_end)) = delimited(
+        tag("- Your Highlight at location "),
+        tuple((digit1, take(1usize), digit1)),
+        tag(" |"),
+    )(input)?;
+
+    Ok((input, (location_start, location_end)))
+}
+
+/// Uses nom to parse the location of a clip, updated format
+/// # Variables
+/// * `input` - The input string to parse
+///  * Example: - Your Highlight at location 1502-1507 |
+/// # Returns
+/// * `IResult<&str, (&str, &str)>` - Input remainder + The parsed start and end location
+/// # Errors
+/// * `IResult::Error` - If the input cannot be parsed
+pub fn nom_location_2023_02(input: &str) -> IResult<&str, (&str, &str)> {
+    // Removing the page
+    let (input, _) = take_until("location")(input)?;
+
+    let (input, (location_start, _, location_end)) = delimited(
+        tag("location "),
+        tuple((digit1, take(1usize), digit1)),
+        tag(" |"),
+    )(input)?;
+
+    Ok((input, (location_start, location_end)))
 }
 
 /// Parses a date from the format `1 January 2021 00:00:00`
@@ -209,8 +249,29 @@ The old neighbour called at the White House, and Lincoln talked to him for hours
 It’s important to keep capturing relatively effortless because it is only the first step.
 ";
         let (_, parsed_clip) =
-            nom_single_clip(test_clip).expect("Could not nome clip with parenthesis in title");
+            nom_single_clip(test_clip).expect("Could not nom clip with parenthesis in title");
         insta::assert_yaml_snapshot!(parsed_clip);
+    }
+
+    #[test]
+    fn test_parse_single_clip_2023_02_format() {
+        let test_clip = "Shoe Dog (Phil Knight)
+- Your Highlight on page 58 | location 877-879 | Added on Monday, 13 February 2023 00:29:40
+
+People reflexively assume that competition is always a good thing, that it always brings out the best in people, but that’s only true of people who can forget the competition. The art of competing, I’d learned from track, was the art of forgetting, and I now reminded myself of that fact. You must forget your limits.
+";
+        let (_, parsed_clip) =
+            nom_single_clip(test_clip).expect("Could not nom clip with new format");
+        insta::assert_yaml_snapshot!(parsed_clip);
+    }
+
+    #[test]
+    fn test_parse_location_2023_02() {
+        let test_location = "- Your Highlight on page 58 | location 877-879 |";
+
+        let (_, parsed_location) =
+            nom_location_2023_02(test_location).expect("Could not nom location with new format");
+        insta::assert_yaml_snapshot!(parsed_location);
     }
 
     #[test]

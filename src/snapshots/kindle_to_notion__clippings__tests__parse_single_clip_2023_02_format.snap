@@ -1,0 +1,12 @@
+---
+source: src/clippings.rs
+expression: parsed_clip
+---
+book: Shoe Dog
+author: Phil Knight
+content: "People reflexively assume that competition is always a good thing, that it always brings out the best in people, but that’s only true of people who can forget the competition. The art of competing, I’d learned from track, was the art of forgetting, and I now reminded myself of that fact. You must forget your limits."
+date: "2023-02-13T00:29:40+09:00"
+location:
+  - 877
+  - 879
+
