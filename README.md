@@ -46,6 +46,8 @@ A database page can be used as the root. Each group of quotes will therefore be 
 
 If you want to give a shot, here are some example features that would be welcome additions:
 
+- List books before uploading them
+- Group out of order quotes together
 - Support for database properties
 - Support for updating existing quote pages
 - Support for different usage paradigms, for example 1 quote per page for databases
