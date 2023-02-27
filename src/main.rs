@@ -34,7 +34,7 @@ fn main() {
         .expect("Failed to upload to Notion");
 
     // Marking the end of the clippings only if clips were found
-    if books_clips.len() == 0 {
+    if books_clips.is_empty() {
         return;
     }
 
